@@ -2,6 +2,7 @@
 import sys
 from http_client import fetch
 from parser import strip_html
+from search import search
 
 
 def main():
@@ -21,8 +22,7 @@ def main():
         if len(args) < 2:
             print("usage: go2web -s <search term>", file=sys.stderr)
             sys.exit(1)
-        print("search not implemented yet", file=sys.stderr)
-        sys.exit(1)
+        do_search(" ".join(args[1:]))
 
     else:
         print(f"unknown flag: {args[0]}", file=sys.stderr)
@@ -38,6 +38,25 @@ def do_url(url):
         sys.exit(1)
 
     print(strip_html(resp.body))
+
+
+def do_search(term):
+    try:
+        results = search(term)
+    except Exception as e:
+        print(f"error: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    if not results:
+        print("no results found")
+        return
+
+    for i, r in enumerate(results, 1):
+        print(f"{i}. {r['title']}")
+        print(f"   {r['url']}")
+        if r["desc"]:
+            print(f"   {r['desc']}")
+        print()
 
 
 def print_help():
