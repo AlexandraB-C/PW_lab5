@@ -9,8 +9,11 @@ class Response:
         self.body = body
 
 
-# send a GET request and return a Response
-def fetch(url):
+# send a GET request, follows redirects up to 10 hops
+def fetch(url, _depth=0):
+    if _depth > 10:
+        raise Exception("too many redirects")
+
     parsed = urlparse(url)
     host = parsed.hostname
     port = parsed.port
@@ -43,10 +46,10 @@ def fetch(url):
         data += chunk
     conn.close()
 
-    return _parse(data.decode("utf-8", errors="replace"))
+    return _parse(data.decode("utf-8", errors="replace"), url, _depth)
 
 
-def _parse(raw):
+def _parse(raw, orig_url, depth):
     idx = raw.find("\r\n\r\n")
     if idx < 0:
         raise Exception("bad response")
@@ -62,6 +65,17 @@ def _parse(raw):
         if ":" in line:
             k, v = line.split(":", 1)
             headers[k.strip().lower()] = v.strip()
+
+    # follow redirects
+    if status in (301, 302, 303, 307, 308):
+        loc = headers.get("location", "")
+        if not loc:
+            raise Exception("redirect with no location")
+        # relative location → make it absolute
+        if loc.startswith("/"):
+            p = urlparse(orig_url)
+            loc = f"{p.scheme}://{p.netloc}{loc}"
+        return fetch(loc, _depth=depth + 1)
 
     # handle chunked
     if "chunked" in headers.get("transfer-encoding", ""):
