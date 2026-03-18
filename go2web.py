@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import sys
 from http_client import fetch
 from parser import strip_html
@@ -32,6 +31,9 @@ def main():
 
 
 def do_url(url):
+    # add scheme if missing
+    if not url.startswith("http://") and not url.startswith("https://"):
+        url = "http://" + url
     cached, found = cache_get(url)
     if found:
         print(cached)
