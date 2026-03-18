@@ -1,0 +1,23 @@
+# internal notes — deleted before submission
+logs/
+
+# python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# file cache from the app
+.cache/
+
+# editors
+.vscode/
+.idea/
+*.swp
+
+# os
+.DS_Store
+Thumbs.db
+
+# go leftovers
+*.exe
+go2web
