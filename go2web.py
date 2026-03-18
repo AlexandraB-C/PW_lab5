@@ -3,6 +3,7 @@ import sys
 from http_client import fetch
 from parser import strip_html
 from search import search
+from cache import cache_get, cache_set
 
 
 def main():
@@ -31,13 +32,20 @@ def main():
 
 
 def do_url(url):
+    cached, found = cache_get(url)
+    if found:
+        print(cached)
+        return
+
     try:
         resp = fetch(url)
     except Exception as e:
         print(f"error: {e}", file=sys.stderr)
         sys.exit(1)
 
-    print(strip_html(resp.body))
+    out = strip_html(resp.body)
+    cache_set(url, out)
+    print(out)
 
 
 def do_search(term):
