@@ -43,7 +43,8 @@ def do_url(url):
         print(f"error: {e}", file=sys.stderr)
         sys.exit(1)
 
-    out = strip_html(resp.body)
+    # json is already readable, html needs stripping
+    out = resp.body if resp.is_json() else strip_html(resp.body)
     cache_set(url, out)
     print(out)
 

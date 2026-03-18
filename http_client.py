@@ -8,6 +8,10 @@ class Response:
         self.headers = headers  # lowercase keys
         self.body = body
 
+    def is_json(self):
+        ct = self.headers.get("content-type", "")
+        return "application/json" in ct
+
 
 # send a GET request, follows redirects up to 10 hops
 def fetch(url, _depth=0):
@@ -30,6 +34,7 @@ def fetch(url, _depth=0):
 
     req = f"GET {path} HTTP/1.1\r\n"
     req += f"Host: {host}\r\n"
+    req += "Accept: application/json, text/html\r\n"  # content negotiation
     req += "Connection: close\r\n"
     req += "User-Agent: go2web/1.0\r\n"
     req += "Accept-Encoding: identity\r\n"
