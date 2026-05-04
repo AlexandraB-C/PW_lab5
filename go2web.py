@@ -5,6 +5,11 @@ from search import search
 from cache import cache_get, cache_set
 
 
+# osc 8 hyperlink — clickable in vscode terminal (ctrl+click or just click)
+def _link(url):
+    return f"\x1b]8;;{url}\x1b\\{url}\x1b]8;;\x1b\\"
+
+
 def main():
     args = sys.argv[1:]
 
@@ -64,7 +69,7 @@ def do_search(term):
 
     for i, r in enumerate(results, 1):
         print(f"{i}. {r['title']}")
-        print(f"   {r['url']}")
+        print(f"   {_link(r['url'])}")
         if r["desc"]:
             print(f"   {r['desc']}")
         print()
